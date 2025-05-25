@@ -9,26 +9,27 @@
       font-family: Arial, sans-serif;
       text-align: center;
       background-color: #830bb2;
+      margin: 0;
+      padding: 0;
     }
 
     h1 {
-      margin-top: 20px;
-      font-size: 3rem;
+      margin: 20px 0;
+      font-size: 2.5rem;
       color: white;
     }
 
     .game-board {
       display: grid;
-      grid-template-columns: repeat(4, 150px);
-      grid-gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
       justify-content: center;
-      margin: 30px auto;
+      margin: 20px auto;
       max-width: 700px;
+      padding: 0 10px;
     }
 
     .card {
-      width: 150px;
-      height: 150px;
       background-color: #1e90ff;
       cursor: pointer;
       position: relative;
@@ -36,6 +37,8 @@
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
       transition: transform 0.3s ease;
+      width: 100%;
+      aspect-ratio: 1 / 1; /* hace que siempre sea cuadrada */
     }
 
     .card.flip .front {
@@ -56,7 +59,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 60px;
+      font-size: 2.5rem;
       user-select: none;
     }
 
@@ -71,15 +74,15 @@
     }
 
     .card .back img {
-      width: 120px;
-      height: 120px;
+      width: 80%;
+      height: 80%;
       border-radius: 10px;
       object-fit: cover;
       user-select: none;
     }
 
     #btnSound {
-      margin: 15px;
+      margin: 10px auto;
       padding: 10px 20px;
       font-size: 16px;
       border: none;
@@ -88,12 +91,27 @@
       border-radius: 8px;
       cursor: pointer;
     }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      #btnSound {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      .card .front, .card .back {
+        font-size: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Audio de fondo sin autoplay ni muted -->
-  <audio id="backgroundMusic" src="imagenes/fondo.mp3" loop></audio>
+  <!-- Audio de fondo -->
+  <audio id="backgroundMusic" src="imagenes/fondo.mp3" autoplay loop muted></audio>
   <button id="btnSound">Activar Sonido</button>
 
   <h1>Memorama</h1>
@@ -136,81 +154,3 @@
 
     let firstCard = null;
     let secondCard = null;
-    let lockBoard = false;
-
-    function flipCard() {
-      if (lockBoard) return;
-      if (this === firstCard) return;
-
-      this.classList.add('flip');
-
-      if (!firstCard) {
-        firstCard = this;
-        return;
-      }
-
-      secondCard = this;
-      checkForMatch();
-    }
-
-    function checkForMatch() {
-      const firstBack = firstCard.querySelector('.back');
-      const secondBack = secondCard.querySelector('.back');
-
-      let firstContent = firstBack.textContent.trim();
-      let secondContent = secondBack.textContent.trim();
-
-      const firstImg = firstBack.querySelector('img');
-      const secondImg = secondBack.querySelector('img');
-
-      if (firstImg && secondImg) {
-        firstContent = firstImg.src;
-        secondContent = secondImg.src;
-      }
-
-      const isMatch = firstContent === secondContent;
-
-      isMatch ? disableCards() : unflipCards();
-    }
-
-    function disableCards() {
-      firstCard.removeEventListener('click', flipCard);
-      secondCard.removeEventListener('click', flipCard);
-      resetBoard();
-    }
-
-    function unflipCards() {
-      lockBoard = true;
-      setTimeout(() => {
-        firstCard.classList.remove('flip');
-        secondCard.classList.remove('flip');
-        resetBoard();
-      }, 1000);
-    }
-
-    function resetBoard() {
-      [firstCard, secondCard] = [null, null];
-      lockBoard = false;
-    }
-
-    // Controlar sonido
-    const music = document.getElementById('backgroundMusic');
-    const btnSound = document.getElementById('btnSound');
-    let isPlaying = false;
-
-    btnSound.addEventListener('click', () => {
-      if (!isPlaying) {
-        music.play().then(() => {
-          isPlaying = true;
-          btnSound.textContent = 'Silenciar Sonido';
-        }).catch((e) => {
-          console.log('Error al reproducir música:', e);
-        });
-      } else {
-        music.muted = !music.muted;
-        btnSound.textContent = music.muted ? 'Activar Sonido' : 'Silenciar Sonido';
-      }
-    });
-  </script>
-</body>
-</html>
