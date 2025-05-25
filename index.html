@@ -154,3 +154,70 @@
 
     let firstCard = null;
     let secondCard = null;
+    let lockBoard = false;
+
+    function flipCard() {
+      if (lockBoard || this === firstCard) return;
+
+      this.classList.add('flip');
+
+      if (!firstCard) {
+        firstCard = this;
+        return;
+      }
+
+      secondCard = this;
+      checkForMatch();
+    }
+
+    function checkForMatch() {
+      const firstBack = firstCard.querySelector('.back');
+      const secondBack = secondCard.querySelector('.back');
+
+      let firstContent = firstBack.textContent.trim();
+      let secondContent = secondBack.textContent.trim();
+
+      const firstImg = firstBack.querySelector('img');
+      const secondImg = secondBack.querySelector('img');
+
+      if (firstImg && secondImg) {
+        firstContent = firstImg.src;
+        secondContent = secondImg.src;
+      }
+
+      const isMatch = firstContent === secondContent;
+
+      isMatch ? disableCards() : unflipCards();
+    }
+
+    function disableCards() {
+      firstCard.removeEventListener('click', flipCard);
+      secondCard.removeEventListener('click', flipCard);
+      resetBoard();
+    }
+
+    function unflipCards() {
+      lockBoard = true;
+      setTimeout(() => {
+        firstCard.classList.remove('flip');
+        secondCard.classList.remove('flip');
+        resetBoard();
+      }, 1000);
+    }
+
+    function resetBoard() {
+      [firstCard, secondCard] = [null, null];
+      lockBoard = false;
+    }
+
+    // Controlar sonido
+    const music = document.getElementById('backgroundMusic');
+    const btnSound = document.getElementById('btnSound');
+
+    btnSound.addEventListener('click', () => {
+      music.muted = !music.muted;
+      btnSound.textContent = music.muted ? 'Activar Sonido' : 'Silenciar Sonido';
+    });
+  </script>
+</body>
+</html>
